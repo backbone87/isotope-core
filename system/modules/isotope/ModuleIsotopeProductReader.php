@@ -104,7 +104,10 @@ class ModuleIsotopeProductReader extends ModuleIsotope
 			return;
 		}
 
-		$this->Template->product = $objProduct->generate((strlen($this->iso_reader_layout) ? $this->iso_reader_layout : $objProduct->reader_template), $this);
+		$strTemplate = $this->getProductTemplate($objProduct);
+		$this->Template->product = $objProduct->generate($strTemplate, $this);
+		$this->Template->product_id = ($objProduct->cssID[0] != '') ? ' id="' . $objProduct->cssID[0] . '"' : '';
+		$this->Template->product_class = trim('product ' . $objProduct->cssID[1]);
 		$this->Template->referer = 'javascript:history.go(-1)';
 		$this->Template->back = $GLOBALS['TL_LANG']['MSC']['goBack'];
 
@@ -115,5 +118,21 @@ class ModuleIsotopeProductReader extends ModuleIsotope
 
 		$GLOBALS['TL_KEYWORDS'] .= (strlen($GLOBALS['TL_KEYWORDS']) ? ', ' : '') . $objProduct->keywords_meta;
 	}
+
+	private $arrProductTemplates;
+	
+	protected function getProductTemplate($objProduct) {
+		if(!isset($this->arrProductTemplates)) {
+			$this->arrProductTemplates = deserialize($this->iso_reader_layoutPerType, true);
+		}
+		if(strlen($this->arrProductTemplates[$objProduct->type])) {
+			return $this->arrProductTemplates[$objProduct->type];
+		}
+		if(strlen($this->iso_reader_layout)) {
+			return $this->iso_reader_layout;
+		}
+		return $objProduct->reader_template;
+	}
+	
 }
 
