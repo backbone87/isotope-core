@@ -666,7 +666,7 @@ class tl_module_isotope extends Backend
 	 * @param DataContainer
 	 * @return array
 	 */
-	public function getListTemplates(DataContainer $dc)
+	public function getListTemplates($dc)
 	{
 		$intPid = $dc->activeRecord->pid;
 
@@ -684,7 +684,7 @@ class tl_module_isotope extends Backend
 	 * @param DataContainer
 	 * @return array
 	 */
-	public function getReaderTemplates(DataContainer $dc)
+	public function getReaderTemplates($dc)
 	{
 		$intPid = $dc->activeRecord->pid;
 
@@ -769,7 +769,7 @@ class tl_module_isotope extends Backend
 		return $arrModules;
 	}
 	
-	public function getProductTypes(DataContainer $dc) {
+	public function getProductTypes($dc) {
 		$arrTypes = array();
 		
 		$objTypes = $this->Database->execute(
