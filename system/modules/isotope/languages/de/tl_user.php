@@ -26,7 +26,6 @@
  * @author     Nikolas Runde <info@nrmedia.de>
  * @author     Patrick Grob <grob@a-sign.ch>
  * @author     Frank Berger <berger@mediastuff.de>
- * @author     Angelica Schempp <aschempp@gmx.net>
  * @author     Oliver Hoff <oliver@hoff.com>
  * @author     Stefan Preiss <stefan@preiss-at-work.de>
  * @author     Nina Gerling <gerling@ena-webstudio.de>
@@ -39,5 +38,7 @@ $GLOBALS['TL_LANG']['tl_user']['iso_configs'][0] = 'Shop-Konfigurationen';
 $GLOBALS['TL_LANG']['tl_user']['iso_configs'][1] = 'Nutzer können Bestellungen aus diesen Shop-Konfigurationen sehen.';
 $GLOBALS['TL_LANG']['tl_user']['iso_modules'][0] = 'Isotope-Module';
 $GLOBALS['TL_LANG']['tl_user']['iso_modules'][1] = 'Wählen Sie auf welche Shop-Konfigurationsmodule die Nutzer Zugriff haben.';
+$GLOBALS['TL_LANG']['tl_user']['iso_groups'][0] = 'Erlaubte Produktgruppen';
+$GLOBALS['TL_LANG']['tl_user']['iso_groups'][1] = 'Zugriff auf Produktegruppen für diese Benutzergruppe limitieren. Wird vererbt.';
 $GLOBALS['TL_LANG']['tl_user']['isotope_legend'] = 'Isotope eCommerce';
 

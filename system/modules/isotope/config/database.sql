@@ -34,6 +34,7 @@ CREATE TABLE `tl_iso_products` (
   `shipping_weight` varchar(255) NOT NULL default '',
   `shipping_exempt` char(1) NOT NULL default '',
   `tax_class` int(10) unsigned NOT NULL default '0',
+  `baseprice` varchar(255) NOT NULL default '',
   `protected` char(1) NOT NULL default '',
   `groups` blob NULL,
   `guests` char(1) NOT NULL default '',
@@ -189,6 +190,7 @@ CREATE TABLE `tl_iso_attributes` (
   `uploadFolder` varchar(255) NOT NULL default '',
   `useHomeDir` char(1) NOT NULL default '',
   `doNotOverwrite` char(1) NOT NULL default '',
+  `path` varchar(255) NOT NULL default '',
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -607,6 +609,21 @@ CREATE TABLE `tl_iso_orderstatus` (
 -- --------------------------------------------------------
 
 --
+-- Table `tl_iso_base_price`
+--
+
+CREATE TABLE `tl_iso_baseprice` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `tstamp` int(10) unsigned NOT NULL default '0',
+  `name` varchar(255) NOT NULL default '',
+  `label` varchar(255) NOT NULL default '',
+  PRIMARY KEY  (`id`),
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+
+-- --------------------------------------------------------
+
+--
 -- Table `tl_iso_mail`
 --
 
@@ -769,6 +786,7 @@ CREATE TABLE `tl_module` (
   `iso_mail_admin` int(10) unsigned NOT NULL default '0',
   `iso_sales_email` varchar(255) NOT NULL default '',
   `iso_order_conditions` int(10) unsigned NOT NULL default '0',
+  `iso_order_conditions_position` varchar(6) NOT NULL default 'after',
   `iso_addToAddressbook` char(1) NOT NULL default '',
   `iso_category_scope` varchar(64) NOT NULL default '',
   `iso_list_where` varchar(255) NOT NULL default '',
@@ -780,6 +798,7 @@ CREATE TABLE `tl_module` (
   `iso_filterFields` blob NULL,
   `iso_sortingFields` blob NULL,
   `iso_searchFields` blob NULL,
+  `iso_searchAutocomplete` varchar(255) NOT NULL default '',
   `iso_enableLimit` char(1) NOT NULL default '',
   `iso_cart_jumpTo` int(10) unsigned NOT NULL default '0',
   `iso_checkout_jumpTo` int(10) unsigned NOT NULL default '0',
@@ -789,8 +808,10 @@ CREATE TABLE `tl_module` (
   `iso_listingSortDirection` varchar(8) NOT NULL default '',
   `iso_buttons` blob NULL,
   `iso_related_categories` blob NULL,
-  `iso_noProducts` varchar(255) NOT NULL default '',
   `iso_emptyMessage` char(1) NOT NULL default '',
+  `iso_noProducts` varchar(255) NOT NULL default '',
+  `iso_emptyFilter` char(1) NOT NULL default '',
+  `iso_noFilter` varchar(255) NOT NULL default '',
   `iso_includeMessages` char(1) NOT NULL default '',
   `iso_productcache` blob NULL,
   `iso_continueShopping` char(1) NOT NULL default '',
@@ -819,6 +840,8 @@ CREATE TABLE `tl_user` (
  `iso_mailp` blob NULL,
  `iso_configs` blob NULL,
  `iso_configp` blob NULL,
+ `iso_groups` blob NULL
+ `iso_groupp` blob NULL,
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 
@@ -844,6 +867,8 @@ CREATE TABLE `tl_user_group` (
  `iso_mailp` blob NULL,
  `iso_configs` blob NULL,
  `iso_configp` blob NULL,
+ `iso_groups` blob NULL
+ `iso_groupp` blob NULL,
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 

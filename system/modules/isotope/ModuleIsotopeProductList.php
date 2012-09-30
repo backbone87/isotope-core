@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Fred Bliss <fred.bliss@intelligentspark.com>
  * @author     Andreas Schempp <andreas@schempp.ch>
  * @license    http://opensource.org/licenses/lgpl-3.0.html
@@ -68,6 +68,12 @@ class ModuleIsotopeProductList extends ModuleIsotope
 		if ($this->iso_hide_list && $this->Input->get('product') != '')
 		{
 			return '';
+		}
+
+		// return message if no filter is set
+		if ($this->iso_emptyFilter && !$this->Input->get('isorc'))
+		{
+			return $this->iso_noFilter;
 		}
 
 		$this->iso_filterModules = deserialize($this->iso_filterModules, true);
@@ -225,7 +231,7 @@ class ModuleIsotopeProductList extends ModuleIsotope
 		}
 
 		// No products found
-		if (!is_array($arrProducts) || !count($arrProducts))
+		if (!is_array($arrProducts) || empty($arrProducts))
 		{
 			$this->Template = new FrontendTemplate('mod_message');
 			$this->Template->type = 'empty';
@@ -249,6 +255,16 @@ class ModuleIsotopeProductList extends ModuleIsotope
 				'class'	=> $objProduct->cssID[1],
 				'html'	=> $objProduct->generate((strlen($this->iso_list_layout) ? $this->iso_list_layout : $objProduct->list_template), $this),
 			);
+		}
+
+		// HOOK: to add any product field or attribute to mod_iso_productlist template
+		if (isset($GLOBALS['ISO_HOOKS']['generateProductList']) && is_array($GLOBALS['ISO_HOOKS']['generateProductList']))
+		{
+			foreach ($GLOBALS['ISO_HOOKS']['generateProductList'] as $callback)
+			{
+				$this->import($callback[0]);
+				$arrBuffer = $this->$callback[0]->$callback[1]($arrBuffer, $arrProducts, $this->Template, $this);
+			}
 		}
 
 		$this->Template->products = IsotopeFrontend::generateRowClass($arrBuffer, 'product', 'class', $this->iso_cols);
@@ -366,7 +382,7 @@ class ModuleIsotopeProductList extends ModuleIsotope
 				}
 			}
 
-			if (count($arrWhere))
+			if (!empty($arrWhere))
 			{
 				$time = time();
 				$strWhere = " AND ((p1." . implode(' AND p1.', $arrWhere) . ") OR p1.id IN (SELECT pid FROM tl_iso_products WHERE language='' AND " . implode(' AND ', $arrWhere)

@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Paul Kegel <paul@artified.nl>
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  */
@@ -72,10 +72,10 @@ $GLOBALS['TL_LANG']['tl_iso_attributes']['fe_filter'][0] = 'Sorteerbaar door bez
 $GLOBALS['TL_LANG']['tl_iso_attributes']['fe_filter'][1] = 'Kan dit attribuut worden gebruikt in de sorteermodule';
 $GLOBALS['TL_LANG']['tl_iso_attributes']['fe_search'][0] = 'Doorzoekbaar voor bezoekers';
 $GLOBALS['TL_LANG']['tl_iso_attributes']['fe_search'][1] = 'Zou de zoekmachine zoeken in dit veld voor data?';
-$GLOBALS['TL_LANG']['tl_iso_attributes']['opValue'] = 'Waarde';
-$GLOBALS['TL_LANG']['tl_iso_attributes']['opLabel'] = 'Label';
-$GLOBALS['TL_LANG']['tl_iso_attributes']['opDefault'] = 'Standaard';
-$GLOBALS['TL_LANG']['tl_iso_attributes']['opGroup'] = 'Groep';
+$GLOBALS['TL_LANG']['tl_iso_attributes']['options']['value'] = array('Waarde');
+$GLOBALS['TL_LANG']['tl_iso_attributes']['options']['label'] = array('Label');
+$GLOBALS['TL_LANG']['tl_iso_attributes']['options']['default'] = array('Standaard');
+$GLOBALS['TL_LANG']['tl_iso_attributes']['options']['group'] = array('Groep');
 $GLOBALS['TL_LANG']['tl_iso_attributes']['digit'][0] = 'Numerieke karakters';
 $GLOBALS['TL_LANG']['tl_iso_attributes']['digit'][1] = 'Staat numerieke karakters toe, behalve min (-), punt (.) en spatie( ).';
 $GLOBALS['TL_LANG']['tl_iso_attributes']['alpha'][0] = 'Alphabetische karakters';

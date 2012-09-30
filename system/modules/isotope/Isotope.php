@@ -128,6 +128,12 @@ class Isotope extends Controller
 						$GLOBALS['ISO_SORTING'] = deserialize($objRequestCache->sorting);
 						$GLOBALS['ISO_LIMIT'] = deserialize($objRequestCache->limits);
 					}
+					else
+					{
+						unset($_GET['isorc']);
+						$strQuery = http_build_query($_GET);
+						self::$objInstance->redirect(preg_replace('/\?.*$/i', '', self::$objInstance->Environment->request) . (($strQuery) ? '?' . $strQuery : ''));
+					}
 				}
 			}
 		}
@@ -339,7 +345,7 @@ class Isotope extends Controller
 
 		if (!is_array($arrAddresses))
 		{
-			$arrAddresses = array('billing'=>$this->Cart->billingAddress, 'shipping'=>$this->Cart->shippingAddress);
+			$arrAddresses = array('billing'=>$this->Cart->billing_address, 'shipping'=>$this->Cart->shipping_address);
 		}
 
 		$objTaxClass = $this->Database->prepare("SELECT * FROM tl_iso_tax_class WHERE id=?")->limit(1)->execute($intTaxClass);
@@ -410,7 +416,7 @@ class Isotope extends Controller
 		$arrRates = deserialize($objTaxClass->rates);
 
 		// Return if there are no rates
-		if (!is_array($arrRates) || !count($arrRates))
+		if (!is_array($arrRates) || empty($arrRates))
 		{
 			return $arrTaxes;
 		}
@@ -485,7 +491,7 @@ class Isotope extends Controller
 			}
 		}
 
-		if (is_array($objRate->address) && count($objRate->address))
+		if (is_array($objRate->address) && count($objRate->address)) // Can't use empty() because its an object property (using __get)
 		{
 			foreach ($arrAddresses as $name => $arrAddress)
 			{
@@ -517,7 +523,7 @@ class Isotope extends Controller
 
 				$arrPrice = deserialize($objRate->amount);
 
-				if (is_array($arrPrice) && count($arrPrice) && strlen($arrPrice[0]))
+				if (is_array($arrPrice) && !empty($arrPrice) && strlen($arrPrice[0]))
 				{
 					if (strlen($arrPrice[1]))
 					{
@@ -580,7 +586,7 @@ class Isotope extends Controller
 
 		$arrFormat = $GLOBALS['ISO_NUM'][$this->Config->currencyFormat];
 
-		if (!is_array($arrFormat) || !count($arrFormat) == 3)
+		if (!is_array($arrFormat))
 		{
 			return $fltPrice;
 		}
@@ -695,87 +701,16 @@ class Isotope extends Controller
 
 	/**
 	 * Generate an address string
-	 * @param array
-	 * @param array
-	 * @return string
+	 * @deprecated Please use the IsotopeAddressModel class
 	 */
 	public function generateAddressString($arrAddress, $arrFields=null)
 	{
-		if (!is_array($arrAddress) || !count($arrAddress))
-		{
-			return $arrAddress;
-		}
+		trigger_error('Using Isotope::generateAddressString() is deprecated. Please use the IsotopeAddressModel class.', E_USER_NOTICE);
 
-		if (!is_array($GLOBALS['ISO_ADR']))
-		{
-			$this->loadLanguageFile('countries');
-		}
+		$objAddress = new IsotopeAddressModel();
+		$objAddress->setData($arrAddress);
 
-		if (!is_array($arrFields))
-		{
-			$arrFields = deserialize($this->Config->billing_fields, true);
-		}
-
-		// We need a country to format the address, user default country if none is available
-		if (!strlen($arrAddress['country']))
-		{
-			$arrAddress['country'] = $this->Config->country;
-		}
-
-		$arrSearch = array();
-		$arrReplace = array();
-
-		foreach ($arrFields as $arrField)
-		{
-			$strField = $arrField['value'];
-
-			if ($strField == 'subdivision' && strlen($arrAddress['subdivision']))
-			{
-				if (!is_array($GLOBALS['TL_LANG']['DIV']))
-				{
-					$this->loadLanguageFile('subdivisions');
-				}
-
-				list($country, $subdivion) = explode('-', $arrAddress['subdivision']);
-				$arrAddress['subdivision'] = $GLOBALS['TL_LANG']['DIV'][$country][$arrAddress['subdivision']];
-
-				$arrSearch[] = '{subdivision-abbr}';
-				$arrReplace[] = $subdivion;
-			}
-
-			$arrSearch[] = '{' . $strField . '}';
-			$arrReplace[] = $this->formatValue('tl_iso_addresses', $strField, $arrAddress[$strField]);
-		}
-
-		// Parse format
-		$strAddress = str_replace($arrSearch, $arrReplace, $GLOBALS['ISO_ADR'][$arrAddress['country']]);
-
-		// Remove empty tags
-		$strAddress = preg_replace('(\{[^}]+\})', '', $strAddress);
-
-		// Remove empty brackets
-		$strAddress = str_replace('()', '', $strAddress);
-
-		// Remove double line breaks
-		do
-		{
-			$strAddress = str_replace('<br /><br />', '<br />', trim($strAddress), $found);
-		}
-		while ($found > 0);
-
-		// Remove line break at beginning of address
-		if (strpos($strAddress, '<br />') === 0)
-		{
-			$strAddress = substr($strAddress, 6);
-		}
-
-		// Remove line break at end of address
-		if (substr($strAddress, -6) == '<br />')
-		{
-			$strAddress = substr($strAddress, 0, -6);
-		}
-
-		return $strAddress;
+		return $objAddress->generateHtml($arrFields);
 	}
 
 
@@ -876,7 +811,7 @@ class Isotope extends Controller
 	 */
 	public function calculateWeight($arrWeights, $strUnit)
 	{
-		if (!is_array($arrWeights) || !count($arrWeights))
+		if (!is_array($arrWeights) || empty($arrWeights))
 		{
 			return 0;
 		}
@@ -1145,7 +1080,7 @@ class Isotope extends Controller
 		}
 
 		// Label
-		if (count($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['label']))
+		if (!empty($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['label']))
 		{
 			$strLabel = is_array($GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['label']) ? $GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['label'][0] : $GLOBALS['TL_DCA'][$strTable]['fields'][$strField]['label'];
 		}
@@ -1172,7 +1107,7 @@ class Isotope extends Controller
 	 */
 	public function mergeMediaData($arrCurrent, $arrParent)
 	{
-		if (is_array($arrParent) && count($arrParent))
+		if (is_array($arrParent) && !empty($arrParent))
 		{
 			$arrTranslate = array();
 
@@ -1185,7 +1120,7 @@ class Isotope extends Controller
 				}
 			}
 
-			if (is_array($arrCurrent) && count($arrCurrent))
+			if (is_array($arrCurrent) && !empty($arrCurrent))
 			{
 				foreach ($arrCurrent as $i => $image)
 				{
@@ -1210,7 +1145,7 @@ class Isotope extends Controller
 				}
 
 				// Add remaining parent image to the list
-				if (count($arrTranslate))
+				if (!empty($arrTranslate))
 				{
 					$arrCurrent = array_merge($arrCurrent, array_values($arrTranslate));
 				}
@@ -1243,7 +1178,9 @@ class Isotope extends Controller
 	 * These functions need to be public for Models to access them
 	 */
 	public function replaceInsertTags($strBuffer, $blnCache=false) { return parent::replaceInsertTags($strBuffer, $blnCache); }
+	public function parseSimpleTokens($strBuffer, $arrData) { return parent::parseSimpleTokens($strBuffer, $arrData); }
 	public function convertRelativeUrls($strContent, $strBase='', $blnHrefOnly=false) { return parent::convertRelativeUrls($strContent, $strBase, $blnHrefOnly); }
+	public function loadDataContainer($strName, $blnNoCache=false) { parent::loadDataContainer($strName, $blnNoCache); }
 	public function getCountries() { return parent::getCountries(); }
 }
 

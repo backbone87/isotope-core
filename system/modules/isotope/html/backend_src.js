@@ -194,64 +194,6 @@ var Isotope =
 
 
 	/**
-	 * Image watermark wizard
-	 * @param object
-	 * @param string
-	 * @param string
-	 */
-	imageWatermarkWizard: function(el, command, id)
-	{
-		var table = document.id(id);
-		var tbody = table.getFirst().getNext();
-		var parent = document.id(el).getParent('tr');
-		var rows = tbody.getChildren();
-
-		Backend.getScrollOffset();
-
-		switch (command)
-		{
-			case 'copy':
-				var tr = new Element('tr');
-				var childs = parent.getChildren();
-
-				for (var i=0; i<childs.length; i++)
-				{
-					var next = childs[i].clone(true).injectInside(tr);
-					next.getFirst().value = childs[i].getFirst().value;
-				}
-
-				tr.injectAfter(parent);
-				break;
-
-			case 'delete':
-				(rows.length > 1) ? parent.destroy() : null;
-				break;
-		}
-
-		rows = tbody.getChildren();
-
-		for (var i=0; i<rows.length; i++)
-		{
-			var childs = rows[i].getChildren();
-
-			for (var j=0; j<childs.length; j++)
-			{
-				var first = childs[j].getFirst();
-
-				if (first.type == 'select-one')
-				{
-					first.name = first.name.replace(/\[[0-9]+\]/ig, '[' + i + ']');
-				}
-				else if (first.type == 'text' || first.type == 'checkbox')
-				{
-					first.name = first.name.replace(/\[[0-9]+\]/ig, '[' + i + ']')
-				}
-			}
-		}
-	},
-
-
-	/**
 	 * Toggle checkbox group
 	 * @param object
 	 * @param string
@@ -352,7 +294,7 @@ var Isotope =
 	 */
 	addInteractiveHelp: function()
 	{
-		$$('a.tl_tip').each(function(el)
+		document.getElements('a.tl_tip').each(function(el)
 		{
 			if (el.retrieve('complete'))
 			{
@@ -437,7 +379,7 @@ var Isotope =
 						element.setStyle('display', (event.target.checked ? 'none' : 'initial'));
 
 						// Query would fail if there is no tooltip
-						try { element.getNext(':not(.tl_tip)').setStyle('display', (event.target.checked ? 'none' : 'initial')); } catch (e) {}
+						try { element.getNext(':not(.tl_tip):not(script)').setStyle('display', (event.target.checked ? 'none' : 'initial')); } catch (e) {}
 					}
 				});
 
@@ -450,7 +392,7 @@ var Isotope =
 					el.setStyle('display', (check.checked ? 'none' : 'initial'));
 
 					// Query would fail if there is no tooltip
-					try { el.getNext(':not(.tl_tip)').setStyle('display', (check.checked ? 'none' : 'initial')); } catch (e) {}
+					try { el.getNext(':not(.tl_tip):not(script)').setStyle('display', (check.checked ? 'none' : 'initial')); } catch (e) {}
 				}
 			}
 		});
@@ -643,6 +585,7 @@ window.addEvent('domready', function()
 	Isotope.initializeToolsButton();
 }).addEvent('structure', function()
 {
+	Isotope.addInteractiveHelp();
 	Isotope.initializeToolsButton();
 });
 

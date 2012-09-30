@@ -380,19 +380,20 @@ $return .= '</div></div>';
 		$arrOrderPaymentData = deserialize($objOrder->payment_data,true);
 
 		//Gather product and address data depending on FE(Cart) or BE(Order)
-		if(TL_MODE=='FE')
+		if (TL_MODE=='FE')
 		{
-			$arrBilling = $this->Isotope->Cart->billingAddress;
-			$arrShipping = $this->Isotope->Cart->shippingAddress;
+			$arrBilling = $this->Isotope->Cart->billing_address;
+			$arrShipping = $this->Isotope->Cart->shipping_address;
 			$arrProducts = $this->Isotope->Cart->getProducts();
 		}
 		else
 		{
-			$arrBilling = $objOrder->billingAddress;
-			$arrShipping = $objOrder->shippingAddress;
+			$arrBilling = $objOrder->billing_address;
+			$arrShipping = $objOrder->shipping_address;
 			$arrProducts =  $objOrder->getProducts();
 		}
-		if(count($arrProducts))
+
+		if (!empty($arrProducts))
 		{
 			foreach($arrProducts as $objProduct)
 			{
@@ -487,7 +488,7 @@ $return .= '</div></div>';
 		$fieldsFinal = rtrim($fields, '&');
 
 		//new auth required if one has been sent and the value of that was less than our new value.
-		if(!count($arrOrderPaymentData) || $arrOrderPaymentData['transaction-status']!='Approved' || $blnCapture || (!$blnCapture && count($arrOrderPaymentData) && $fltOrderTotal>$arrOrderPaymentData['grand-total']))
+		if (empty($arrOrderPaymentData) || $arrOrderPaymentData['transaction-status'] != 'Approved' || $blnCapture || (!$blnCapture && !empty($arrOrderPaymentData) && $fltOrderTotal>$arrOrderPaymentData['grand-total']))
 		{
 			$objRequest = new Request();
 
@@ -531,7 +532,7 @@ $return .= '</div></div>';
 		}
 
 		//Update payment data AKA Response Data. Transaction ID will not be saved during test mode.
-		$arrPaymentInfo = (count($arrOrderPaymentData)) ? array_merge($arrOrderPaymentData, $arrResponses) : $arrResponses;
+		$arrPaymentInfo = (!empty($arrOrderPaymentData)) ? array_merge($arrOrderPaymentData, $arrResponses) : $arrResponses;
 
 		$objOrder->payment_data = serialize($arrPaymentInfo);
 

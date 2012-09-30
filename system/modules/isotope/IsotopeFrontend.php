@@ -733,7 +733,7 @@ $endScript";
 	public function generateDownloadAttribute($attribute, $arrData, $arrFiles)
 	{
 		// Return if there are no files
-		if (!is_array($arrFiles) || count($arrFiles) < 1)
+		if (!is_array($arrFiles) || empty($arrFiles))
 		{
 			return '';
 		}
@@ -954,7 +954,7 @@ $endScript";
 	public static function getProducts($objProductData, $intReaderPage=0, $blnCheckAvailability=true, array $arrFilters=array(), array $arrSorting=array())
 	{
 		// $objProductData can also be an array of product ids
-		if (is_array($objProductData) && count($objProductData))
+		if (is_array($objProductData) && !empty($objProductData))
 		{
 			$time = time();
 			$Database = Database::getInstance();
@@ -1094,7 +1094,7 @@ $endScript";
 			}
 		}
 
-		if (count($arrGroups) && in_array(false, $arrGroups))
+		if (!empty($arrGroups) && in_array(false, $arrGroups))
 		{
 			return false;
 		}
@@ -1245,13 +1245,14 @@ $endScript";
 	 */
 	public static function formatSurcharges($arrSurcharges)
 	{
+		$i = 0;
 		$Isotope = Isotope::getInstance();
 
 		foreach ($arrSurcharges as $k => $arrSurcharge)
 		{
 			$arrSurcharges[$k]['price']			= $Isotope->formatPriceWithCurrency($arrSurcharge['price']);
 			$arrSurcharges[$k]['total_price']	= $Isotope->formatPriceWithCurrency($arrSurcharge['total_price']);
-			$arrSurcharges[$k]['rowClass']		= trim('foot_'.($k+1) . ' ' . $arrSurcharge[$k]['rowClass']);
+			$arrSurcharges[$k]['rowClass']		= trim('foot_'.(++$i) . ' ' . $arrSurcharge[$k]['rowClass']);
 		}
 
 		return $arrSurcharges;
@@ -1273,7 +1274,7 @@ $endScript";
 		$objProducts = $this->Database->execute(IsotopeProduct::getSelectStatement() . " WHERE p1.language='' AND p1.pid=0 AND p1.published=1 AND (p1.start='' OR p1.start<$time) AND (p1.stop='' OR p1.stop>$time)");
 		$arrProducts = self::getProducts($objProducts);
 
-		if (!count($arrProducts))
+		if (empty($arrProducts))
 		{
 			return;
 		}
@@ -1291,15 +1292,12 @@ $endScript";
 			$arrCategories = $objProduct->categories;
 
 			// filter those that are allowed
-			if(count($arrAllowedPageIds))
-				$arrCategories = array_intersect($arrCategories, $arrAllowedPageIds);
-
-			if (!is_array($arrCategories) || !count($arrCategories))
+			if (!empty($arrAllowedPageIds))
 			{
-				continue;
+				$arrCategories = array_intersect($arrCategories, $arrAllowedPageIds);
 			}
 
-			if (!is_array($arrCategories) || !count($arrCategories))
+			if (!is_array($arrCategories) || empty($arrCategories))
 			{
 				continue;
 			}
@@ -1313,11 +1311,13 @@ $endScript";
 
 			while($objCategoryPages->next())
 			{
-				// set the reader jump to page
 				$objProduct->reader_jumpTo = self::getReaderPageId($objCategoryPages);
+				$strUrl = $objProduct->href_reader;
 
-				// generate the front end url
-				$arrIsotopeProductPages[] = $this->Environment->base . ltrim($objProduct->href_reader,'/');
+				if ($strUrl != '')
+				{
+					$arrIsotopeProductPages[] = $this->Environment->base . ltrim($strUrl, '/');
+				}
 			}
 		}
 
@@ -1485,6 +1485,17 @@ $endScript";
 	public static function clearTimeout()
 	{
 		unset($_SESSION['ISO_TIMEOUT']);
+	}
+
+
+	/**
+	 * Store the current article ID so we know it for the product list
+	 * @param Database_Result
+	 */
+	public function storeCurrentArticle($objRow)
+	{
+		$GLOBALS['ISO_CONFIG']['current_article']['id'] = $objRow->id;
+		$GLOBALS['ISO_CONFIG']['current_article']['pid'] = $objRow->pid;
 	}
 }
 

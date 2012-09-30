@@ -39,7 +39,7 @@ $GLOBALS['TL_LANG']['tl_iso_config']['store_id']						= array('Store ID', 'Use d
 $GLOBALS['TL_LANG']['tl_iso_config']['missing_image_placeholder']		= array('Missing Image Placeholder', 'This image will be used if an image file cannot be found or none are associated with a product.');
 $GLOBALS['TL_LANG']['tl_iso_config']['priceCalculateFactor']			= array('Price factor', 'Defaults should be 1. You can use this to convert between multiple currencies.');
 $GLOBALS['TL_LANG']['tl_iso_config']['priceCalculateMode']				= array('Calculation mode', 'Divide or multiply using this factor.');
-$GLOBALS['TL_LANG']['tl_iso_config']['priceRoundPrecision']				= array('Rounding precision', 'How much decimal precicion to have. You should set something between 0 and 2 for all payment gateways to work correctly. See PHP manual for round().');
+$GLOBALS['TL_LANG']['tl_iso_config']['priceRoundPrecision']				= array('Rounding precision', 'How much decimal precision to have. You should set something between 0 and 2 for all payment gateways to work correctly. See PHP manual for round().');
 $GLOBALS['TL_LANG']['tl_iso_config']['priceRoundIncrement']				= array('Rounding increment', 'Some currencies (eg. swiss francs) do not support 0.01 precision.');
 $GLOBALS['TL_LANG']['tl_iso_config']['cartMinSubtotal']					= array('Minimum subtotal', 'The minimum cart subtotal required to order. Enter 0 to disable.');
 $GLOBALS['TL_LANG']['tl_iso_config']['currency']						= array('Currency', 'Please select a currency for this store.');
@@ -95,12 +95,12 @@ $GLOBALS['TL_LANG']['tl_iso_config']['bc']								= 'Bottom';
 $GLOBALS['TL_LANG']['tl_iso_config']['br']								= 'Bottom Right';
 $GLOBALS['TL_LANG']['tl_iso_config']['cc']								= 'Center';
 
-$GLOBALS['TL_LANG']['tl_iso_config']['iwName']							= 'Name';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwWidth']							= 'Width';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwHeight']						= 'Height';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwMode']							= 'Mode';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwWatermark']						= 'Watermark image';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwPosition']						= 'Position';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwName']							= array('Name');
+$GLOBALS['TL_LANG']['tl_iso_config']['iwWidth']							= array('Width');
+$GLOBALS['TL_LANG']['tl_iso_config']['iwHeight']						= array('Height');
+$GLOBALS['TL_LANG']['tl_iso_config']['iwMode']							= array('Mode');
+$GLOBALS['TL_LANG']['tl_iso_config']['iwWatermark']						= array('Watermark image');
+$GLOBALS['TL_LANG']['tl_iso_config']['iwPosition']						= array('Position');
 
 $GLOBALS['TL_LANG']['tl_iso_config']['fwEnabled']						= 'Enable field';
 $GLOBALS['TL_LANG']['tl_iso_config']['fwLabel']							= 'Custom label';

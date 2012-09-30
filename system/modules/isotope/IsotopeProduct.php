@@ -282,14 +282,15 @@ class IsotopeProduct extends Controller
 
 			case 'available':
 				return $this->isAvailable();
-				break;
 
 			case 'hasDownloads':
-				return count($this->getDownloads()) ? true : false;
+				return $this->hasDownloads();
+
+			case 'show_price_tiers':
+				return (bool) $this->arrType['show_price_tiers'];
 
 			case 'description_meta':
 				return $this->arrData['description_meta'] != '' ? $this->arrData['description_meta'] : ($this->arrData['teaser'] != '' ? $this->arrData['teaser'] : $this->arrData['description']);
-				break;
 
 			default:
 				// Initialize attribute
@@ -350,8 +351,27 @@ class IsotopeProduct extends Controller
 		switch ($strKey)
 		{
 			case 'reader_jumpTo':
+
+				// Remove the target URL if no page ID is given
+				if ($varValue == '' || $varValue < 1)
+				{
+					$this->arrData['href_reader'] = '';
+					break;
+				}
+
+				global $objPage;
 				$strUrlKey = $this->arrData['alias'] ? $this->arrData['alias'] : ($this->arrData['pid'] ? $this->arrData['pid'] : $this->arrData['id']);
-				$strUrl = $this->generateFrontendUrl($this->Database->prepare("SELECT * FROM tl_page WHERE id=?")->execute($varValue)->fetchAssoc(), '/product/' . $strUrlKey);
+
+				// make sure the page object is loaded because of the url language feature (e.g. when rebuilding the search index in the back end or ajax actions)
+				if (!$objPage)
+				{
+					$objTargetPage = $this->getPageDetails($varValue);
+					$strUrl  = $this->generateFrontendUrl($objTargetPage->row(), '/product/' . $strUrlKey, $objTargetPage->rootLanguage);
+				}
+				else
+				{
+					$strUrl = $this->generateFrontendUrl($this->Database->prepare("SELECT * FROM tl_page WHERE id=?")->execute($varValue)->fetchAssoc(), '/product/' . $strUrlKey, $objPage->rootLanguage);
+				}
 
 				if ($this->arrData['pid'] > 0)
 				{
@@ -446,15 +466,24 @@ class IsotopeProduct extends Controller
 
 
 	/**
+	 * Return all product and variant attributes
+	 * @return array
+	 */
+	public function getProductAndVariantAttributes()
+	{
+		return array_unique(array_merge($this->arrAttributes, $this->arrVariantAttributes));
+	}
+
+
+	/**
 	 * Return all attributes for this product as array
 	 * @return array
 	 */
 	public function getAttributes()
 	{
 		$arrData = array();
-		$arrAttributes = array_unique(array_merge($this->arrAttributes, $this->arrVariantAttributes));
 
-		foreach ($arrAttributes as $attribute)
+		foreach ($this->getProductAndVariantAttributes() as $attribute)
 		{
 			$arrData[$attribute] = $this->$attribute;
 		}
@@ -537,11 +566,11 @@ class IsotopeProduct extends Controller
 	{
 		if (!$this->arrType['downloads'])
 		{
-			return array();
+			$this->arrDownloads = array();
 		}
 
 		// Cache downloads for this product
-		if (!is_array($this->arrDownloads))
+		elseif (!is_array($this->arrDownloads))
 		{
 			$this->arrDownloads = $this->Database->execute("SELECT * FROM tl_iso_downloads WHERE pid={$this->arrData['id']} OR pid={$this->arrData['pid']}")->fetchAllAssoc();
 		}
@@ -567,7 +596,7 @@ class IsotopeProduct extends Controller
 
 		foreach ($this->arrOptions as $field => $value)
 		{
-			if ($value == '')
+			if ($value == '' || $value == '-')
 				continue;
 
 			$arrOptions[] = array
@@ -623,6 +652,20 @@ class IsotopeProduct extends Controller
 	public function hasAdvancedPrices()
 	{
 		return (bool) $this->arrType['prices'];
+	}
+
+
+	/**
+	 * Check if a product has downloads
+	 * @todo Confirm that files are available
+	 * @return array
+	 */
+	public function hasDownloads()
+	{
+		// Cache downloads if not yet done
+		$this->getDownloads();
+
+		return !empty($this->arrDownloads);
 	}
 
 
@@ -698,7 +741,7 @@ class IsotopeProduct extends Controller
 		}
 
 		// Check if "advanced price" is available
-		if ($this->arrData['price'] === null)
+		if ($this->arrData['price'] === null && (in_array('price', $this->arrAttributes) || in_array('price', $this->arrVariantAttributes)))
 		{
 			return false;
 		}
@@ -723,9 +766,9 @@ class IsotopeProduct extends Controller
 		$objTemplate = new IsotopeTemplate($strTemplate);
 		$arrProductOptions = array();
 		$arrAjaxOptions = array();
-		$arrAttributes = $this->getAttributes();
+		$arrToGenerate = array();
 
-		foreach ($arrAttributes as $attribute => $varValue)
+		foreach ($this->getProductAndVariantAttributes() as $attribute)
 		{
 			if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['customer_defined'] || $GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['variant_option'])
 			{
@@ -744,13 +787,18 @@ class IsotopeProduct extends Controller
 			}
 			else
 			{
-				$objTemplate->$attribute = $this->generateAttribute($attribute, $varValue);
+				$arrToGenerate[] = $attribute;
 			}
+		}
+
+		foreach($arrToGenerate as $attribute)
+		{
+			$objTemplate->$attribute = $this->generateAttribute($attribute, $this->$attribute);
 		}
 
 		$arrButtons = array();
 
-		// !HOOK: retrive buttons
+		// !HOOK: retrieve buttons
 		if (isset($GLOBALS['ISO_HOOKS']['buttons']) && is_array($GLOBALS['ISO_HOOKS']['buttons']))
 		{
 			foreach ($GLOBALS['ISO_HOOKS']['buttons'] as $callback)
@@ -787,11 +835,12 @@ class IsotopeProduct extends Controller
 		$objTemplate->href_reader = $this->href_reader;
 		$objTemplate->label_detail = $GLOBALS['TL_LANG']['MSC']['detailLabel'];
 		$objTemplate->options = IsotopeFrontend::generateRowClass($arrProductOptions, 'product_option');
-		$objTemplate->hasOptions = count($arrProductOptions) > 0 ? true : false;
+		$objTemplate->hasOptions = !empty($arrProductOptions) ? true : false;
 		$objTemplate->enctype = $this->hasUpload ? 'multipart/form-data' : 'application/x-www-form-urlencoded';
 		$objTemplate->formId = $this->formSubmit;
 		$objTemplate->action = ampersand($this->Environment->request, true);
 		$objTemplate->formSubmit = $this->formSubmit;
+		$objTemplate->product = $this;
 
 		list(,$startScript, $endScript) = IsotopeFrontend::getElementAndScriptTags();
 		$GLOBALS['TL_MOOTOOLS'][] = $startScript."\nnew {$this->ajaxClass}('{$objModule->id}', '" . ($this->pid ? $this->pid : $this->id) . "', '{$this->formSubmit}', ['ctrl_" . implode("_".$this->formSubmit."', 'ctrl_", $arrAjaxOptions) . "_".$this->formSubmit."'], {language: '{$GLOBALS['TL_LANGUAGE']}', action: '".($objModule instanceof Module ? 'fmd' : 'cte')."', page: {$objPage->id}, loadMessage:'" . specialchars($GLOBALS['ISO_LANG']['MSC']['loadingProductData']) . "'});\n".$endScript;
@@ -822,9 +871,9 @@ class IsotopeProduct extends Controller
 		$this->validateVariant();
 
 		$arrOptions = array();
-		$arrAttributes = $this->getAttributes();
+		$arrToGenerate = array();
 
-		foreach ($arrAttributes as $attribute => $varValue)
+		foreach ($this->getProductAndVariantAttributes() as $attribute)
 		{
 			if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['variant_option']
 			|| $GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['attributes']['ajax_option'])
@@ -838,36 +887,41 @@ class IsotopeProduct extends Controller
 			}
 			elseif (in_array($attribute, $this->arrVariantAttributes))
 			{
-				if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['inputType'] == 'mediaManager')
-				{
-					$objGallery = $this->$attribute;
+				$arrToGenerate[] = $attribute;
+			}
+		}
 
-					foreach ((array) $this->Isotope->Config->imageSizes as $size)
-					{
-						$arrOptions[] = array_merge($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute], array
-						(
-							'id'	=> ($this->formSubmit . '_' . $attribute . '_' . $size['name'] . 'size'),
-							'name'	=> $attribute,
-							'html'	=> $objGallery->generateMainImage($size['name']),
-						));
-					}
+		foreach($arrToGenerate as $attribute)
+		{
+			if ($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute]['inputType'] == 'mediaManager')
+			{
+				$objGallery = $this->$attribute;
 
-					$arrOptions[] = array_merge($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute], array
-					(
-						'id' => ($this->formSubmit . '_' . $attribute . '_gallery'),
-						'name'	=> $attribute,
-						'html' => $objGallery->generateGallery(),
-					));
-				}
-				else
+				foreach ((array) $this->Isotope->Config->imageSizes as $size)
 				{
 					$arrOptions[] = array_merge($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute], array
 					(
-						'id' => ($this->formSubmit . '_' . $attribute),
+						'id'	=> ($this->formSubmit . '_' . $attribute . '_' . $size['name'] . 'size'),
 						'name'	=> $attribute,
-						'html' => $this->generateAttribute($attribute, $varValue),
+						'html'	=> $objGallery->generateMainImage($size['name']),
 					));
 				}
+
+				$arrOptions[] = array_merge($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute], array
+				(
+					'id' => ($this->formSubmit . '_' . $attribute . '_gallery'),
+					'name'	=> $attribute,
+					'html' => $objGallery->generateGallery(),
+				));
+			}
+			else
+			{
+				$arrOptions[] = array_merge($GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute], array
+				(
+					'id' => ($this->formSubmit . '_' . $attribute),
+					'name'	=> $attribute,
+					'html' => $this->generateAttribute($attribute, $this->$attribute),
+				));
 			}
 		}
 
@@ -893,6 +947,7 @@ class IsotopeProduct extends Controller
 	 */
 	protected function generateAttribute($attribute, $varValue)
 	{
+		$strBuffer = '';
 		$arrData = $GLOBALS['TL_DCA']['tl_iso_products']['fields'][$attribute];
 
 		// Return the IsotopeGallery object
@@ -924,6 +979,20 @@ class IsotopeProduct extends Controller
 			if ($fltPrice != $fltOriginalPrice)
 			{
 				$strBuffer = '<div class="original_price"><strike>' . $strOriginalPrice . '</strike></div><div class="price">' . $strBuffer . '</div>';
+			}
+		}
+
+		// Calculate base price
+		elseif ($attribute == 'baseprice')
+		{
+			if (is_array($varValue) && $varValue['unit'] > 0 && $varValue['value'] != '')
+			{
+				$objBasePrice = $this->Database->execute("SELECT * FROM tl_iso_baseprice WHERE id=" . (int) $varValue['unit']);
+
+				if ($objBasePrice->numRows)
+				{
+					$strBuffer = sprintf($objBasePrice->label, $this->Isotope->formatPriceWithCurrency($this->price / $varValue['value']), $varValue['value']);
+				}
 			}
 		}
 
@@ -1140,7 +1209,7 @@ class IsotopeProduct extends Controller
 		}
 		else
 		{
-			if (is_array($GLOBALS['ISO_ATTR'][$arrData['attributes']['type']]['callback']) && count($GLOBALS['ISO_ATTR'][$arrData['attributes']['type']]['callback']))
+			if (is_array($GLOBALS['ISO_ATTR'][$arrData['attributes']['type']]['callback']) && !empty($GLOBALS['ISO_ATTR'][$arrData['attributes']['type']]['callback']))
 			{
 				foreach ($GLOBALS['ISO_ATTR'][$arrData['attributes']['type']]['callback'] as $callback)
 				{
@@ -1399,23 +1468,28 @@ class IsotopeProduct extends Controller
 
 	/**
 	 * Return select statement to load product data including multilingual fields
+	 * @param array an array of columns
 	 * @return string
 	 */
-	public static function getSelectStatement()
+	public static function getSelectStatement($arrColumns=false)
 	{
 		static $strSelect = '';
 
-		if ($strSelect == '')
+		if ($strSelect == '' || $arrColumns !== false)
 		{
-			$arrSelect = array("'".$GLOBALS['TL_LANGUAGE']."' AS language");
+			$arrSelect = ($arrColumns !== false) ? $arrColumns : array('p1.*');
+			$arrSelect[] = "'".$GLOBALS['TL_LANGUAGE']."' AS language";
 
 			foreach ($GLOBALS['ISO_CONFIG']['multilingual'] as $attribute)
 			{
+				if ($arrColumns !== false && !in_array('p1.'.$attribute, $arrColumns))
+					continue;
+
 				$arrSelect[] = "IFNULL(p2.$attribute, p1.$attribute) AS {$attribute}";
 			}
 
-			$strSelect = "
-SELECT p1.*,
+			$strQuery = "
+SELECT
 	" . implode(', ', $arrSelect) . ",
 	t.class AS product_class,
 	c.sorting
@@ -1423,6 +1497,13 @@ FROM tl_iso_products p1
 INNER JOIN tl_iso_producttypes t ON t.id=p1.type
 LEFT OUTER JOIN tl_iso_products p2 ON p1.id=p2.pid AND p2.language='" . $GLOBALS['TL_LANGUAGE'] . "'
 LEFT OUTER JOIN tl_iso_product_categories c ON p1.id=c.pid";
+
+			if ($arrColumns !== false)
+			{
+				return $strQuery;
+			}
+
+			$strSelect = $strQuery;
 		}
 
 		return $strSelect;

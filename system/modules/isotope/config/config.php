@@ -33,7 +33,7 @@
  * Isotope Version
  */
 @define('ISO_VERSION', '1.4');
-@define('ISO_BUILD', 'dev');
+@define('ISO_BUILD', 'beta2');
 
 
 /**
@@ -142,6 +142,11 @@ $GLOBALS['ISO_MOD'] = array
 			'tables'					=> array('tl_iso_config'),
 			'icon'						=> 'system/modules/isotope/html/construction.png',
 		),
+		'baseprice' => array
+		(
+			'tables'					=> array('tl_iso_baseprice'),
+			'icon'						=> 'system/modules/isotope/html/sort-price-descending.png',
+		),
 		'orderstatus' => array
 		(
 			'tables'					=> array('tl_iso_orderstatus'),
@@ -193,7 +198,6 @@ $GLOBALS['BE_FFL']['mediaManager']			= 'MediaManager';
 $GLOBALS['BE_FFL']['attributeWizard']		= 'AttributeWizard';
 $GLOBALS['BE_FFL']['variantWizard']			= 'VariantWizard';
 $GLOBALS['BE_FFL']['inheritCheckbox']		= 'InheritCheckBox';
-$GLOBALS['BE_FFL']['imageWatermarkWizard']	= 'ImageWatermarkWizard';
 $GLOBALS['BE_FFL']['fieldWizard']			= 'FieldWizard';
 $GLOBALS['BE_FFL']['productTree']			= 'ProductTree';
 
@@ -258,6 +262,8 @@ $GLOBALS['TL_PERMISSIONS'][] = 'iso_mails';
 $GLOBALS['TL_PERMISSIONS'][] = 'iso_mailp';
 $GLOBALS['TL_PERMISSIONS'][] = 'iso_configs';
 $GLOBALS['TL_PERMISSIONS'][] = 'iso_configp';
+$GLOBALS['TL_PERMISSIONS'][] = 'iso_groups';
+$GLOBALS['TL_PERMISSIONS'][] = 'iso_groupp';
 
 
 /**
@@ -288,9 +294,10 @@ $GLOBALS['TL_HOOKS']['executePreActions'][]			= array('ProductTree', 'executePre
 $GLOBALS['TL_HOOKS']['executePostActions'][]		= array('ProductTree', 'executePostActions');
 $GLOBALS['TL_HOOKS']['translateUrlParameters'][]	= array('IsotopeFrontend', 'translateProductUrls');
 $GLOBALS['TL_HOOKS']['getSystemMessages'][]			= array('IsotopeBackend', 'getOrderMessages');
+$GLOBALS['TL_HOOKS']['sqlGetFromFile'][]			= array('IsotopeBackend', 'addAttributesToDBUpdate');
+$GLOBALS['TL_HOOKS']['getArticle'][]				= array('IsotopeFrontend', 'storeCurrentArticle');
 $GLOBALS['ISO_HOOKS']['buttons'][]					= array('Isotope', 'defaultButtons');
 $GLOBALS['ISO_HOOKS']['checkoutSurcharge'][]		= array('IsotopeFrontend', 'getShippingAndPaymentSurcharges');
-$GLOBALS['TL_HOOKS']['sqlGetFromFile'][]			= array('IsotopeBackend', 'addAttributesToDBUpdate');
 
 if (TL_MODE == 'FE')
 {
@@ -326,8 +333,11 @@ $GLOBALS['ISO_CHECKOUT_STEPS'] = array
 	),
 	'review' => array
 	(
-		array('ModuleIsotopeCheckout', 'getOrderReviewInterface'),
-		array('ModuleIsotopeCheckout', 'getOrderConditionsInterface')
+		array('ModuleIsotopeCheckout', 'getOrderConditionsOnTop'),
+		array('ModuleIsotopeCheckout', 'getOrderInfoInterface'),
+		array('ModuleIsotopeCheckout', 'getOrderConditionsBeforeProducts'),
+		array('ModuleIsotopeCheckout', 'getOrderProductsInterface'),
+		array('ModuleIsotopeCheckout', 'getOrderConditionsAfterProducts'),
 	)
 );
 

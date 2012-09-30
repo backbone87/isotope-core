@@ -390,7 +390,7 @@ abstract class IsotopeProductCollection extends Model
 
 		$arrProducts = $this->getProducts();
 
-		if (is_array($arrProducts) && count($arrProducts))
+		if (is_array($arrProducts) && !empty($arrProducts))
 		{
 			foreach ($arrProducts as $objProduct)
 			{
@@ -619,7 +619,7 @@ abstract class IsotopeProductCollection extends Model
 				$this->import($callback[0]);
 				$arrSet = $this->$callback[0]->$callback[1]($objProduct, $arrSet, $this);
 
-				if (is_array($arrSet) && !count($arrSet))
+				if (is_array($arrSet) && empty($arrSet))
 				{
 					return false;
 				}
@@ -872,7 +872,7 @@ abstract class IsotopeProductCollection extends Model
 
 		$objTemplate->surcharges = IsotopeFrontend::formatSurcharges($this->getSurcharges());
 		$objTemplate->billing_label = $GLOBALS['TL_LANG']['ISO']['billing_address'];
-		$objTemplate->billing_address = $this->Isotope->generateAddressString(deserialize($this->billing_address), $this->Isotope->Config->billing_fields);
+		$objTemplate->billing_address = $this->billingAddress->generateText($this->Isotope->Config->billing_fields);
 
 		if (strlen($this->shipping_method))
 		{
@@ -887,7 +887,7 @@ abstract class IsotopeProductCollection extends Model
 			{
 				$objTemplate->has_shipping = true;
 				$objTemplate->shipping_label = $GLOBALS['TL_LANG']['ISO']['shipping_address'];
-				$objTemplate->shipping_address = $this->Isotope->generateAddressString($arrShippingAddress, $this->Isotope->Config->shipping_fields);
+				$objTemplate->shipping_address = $this->shippingAddress->generateText($this->Isotope->Config->shipping_fields);
 			}
 		}
 

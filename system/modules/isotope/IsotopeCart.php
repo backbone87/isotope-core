@@ -88,7 +88,6 @@ class IsotopeCart extends IsotopeProductCollection
 		switch ($strKey)
 		{
 			case 'billing_address':
-			case 'billingAddress':
 				if ($this->arrSettings['billingAddress_id'] > 0)
 				{
 					$objAddress = $this->Database->prepare("SELECT * FROM tl_iso_addresses WHERE id=?")->limit(1)->execute($this->arrSettings['billingAddress_id']);
@@ -122,10 +121,9 @@ class IsotopeCart extends IsotopeProductCollection
 				return array('id'=>-1, 'country' => $this->Isotope->Config->billing_country);
 
 			case 'shipping_address':
-			case 'shippingAddress':
 				if ($this->arrSettings['shippingAddress_id'] == -1)
 				{
-					return array_merge($this->billingAddress, array('id' => -1));
+					return array_merge($this->billing_address, array('id' => -1));
 				}
 
 				if ($this->arrSettings['shippingAddress_id'] > 0)
@@ -155,7 +153,7 @@ class IsotopeCart extends IsotopeProductCollection
 					}
 				}
 
-				$arrBilling = $this->billingAddress;
+				$arrBilling = $this->billing_address;
 
 				if ($arrBilling['id'] != -1)
 				{
@@ -163,6 +161,16 @@ class IsotopeCart extends IsotopeProductCollection
 				}
 
 				return array('id'=>-1, 'country' => $this->Isotope->Config->shipping_country);
+
+			case 'billingAddress':
+				$objAddress = new IsotopeAddressModel();
+				$objAddress->setData($this->billing_address);
+				return $objAddress;
+
+			case 'shippingAddress':
+				$objAddress = new IsotopeAddressModel();
+				$objAddress->setData($this->shipping_address);
+				return $objAddress;
 
 			default:
 				return parent::__get($strKey);
@@ -260,13 +268,14 @@ class IsotopeCart extends IsotopeProductCollection
 		// Temporary cart available, move to this cart. Must be after creating a new cart!
  		if (FE_USER_LOGGED_IN === true && $this->strHash != '')
  		{
+ 			$blnMerge = $this->products ? true : false;
 			$objCart = new IsotopeCart();
 
 			if ($objCart->findBy('session', $this->strHash))
 			{
 				$arrIds = $this->transferFromCollection($objCart, false);
 
-				if (!empty($arrIds))
+				if ($blnMerge && !empty($arrIds))
 				{
 					$_SESSION['ISO_CONFIRM'][] = $GLOBALS['TL_LANG']['MSC']['cartMerged'];
 				}

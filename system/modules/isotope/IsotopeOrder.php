@@ -76,12 +76,6 @@ class IsotopeOrder extends IsotopeProductCollection
 			case 'order_id':
 				return $this->strOrderId;
 
-			case 'billingAddress':
-				return deserialize($this->arrData['billing_address'], true);
-
-			case 'shippingAddress':
-				return deserialize($this->arrData['shipping_address'], true);
-
 			case 'paid':
 				// Order is paid if a payment date is set
 				$paid = (int) $this->date_paid;
@@ -103,6 +97,24 @@ class IsotopeOrder extends IsotopeProductCollection
 				break;
 
 			default:
+				if (!isset($this->arrCache[$strKey]))
+				{
+					switch( $strKey )
+					{
+						case 'billingAddress':
+							$objAddress = new IsotopeAddressModel();
+							$objAddress->setData(deserialize($this->arrData['billing_address'], true));
+							$this->arrCache[$strKey] = $objAddress;
+							break;
+
+						case 'shippingAddress':
+							$objAddress = new IsotopeAddressModel();
+							$objAddress->setData(deserialize($this->arrData['shipping_address'], true));
+							$this->arrCache[$strKey] = $objAddress;
+							break;
+					}
+				}
+
 				return parent::__get($strKey);
 		}
 	}
@@ -495,8 +507,11 @@ class IsotopeOrder extends IsotopeProductCollection
 	public function getEmailData()
 	{
 		$arrData = $this->email_data;
+		$arrData['id'] = $this->id;
 		$arrData['order_id'] = $this->order_id;
+		$arrData['uniqid'] = $this->uniqid;
 		$arrData['status'] = $this->statusLabel;
+		$arrData['status_id'] = $this->arrData['status'];
 
 		foreach ($this->billing_address as $k => $v)
 		{
@@ -515,6 +530,16 @@ class IsotopeOrder extends IsotopeProductCollection
 			foreach ($objUser->row() as $k => $v)
 			{
 				$arrData['member_' . $k] = $this->Isotope->formatValue('tl_member', $k, $v);
+			}
+		}
+
+		// !HOOK: add custom email tokens
+		if (isset($GLOBALS['ISO_HOOKS']['getOrderEmailData']) && is_array($GLOBALS['ISO_HOOKS']['getOrderEmailData']))
+		{
+			foreach ($GLOBALS['ISO_HOOKS']['getOrderEmailData'] as $callback)
+			{
+				$objCallback = (in_array('getInstance', get_class_methods($callback[0]))) ? call_user_func(array($callback[0], 'getInstance')) : new $callback[0]();
+				$arrData = $objCallback->$callback[1]($this, $arrData);
 			}
 		}
 

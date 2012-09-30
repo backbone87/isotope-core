@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Rebecca Jutzi <rebecca.jutzi@bluewin.ch>
  * @author     Simon Moos <cc@simonmoos.com>
  * @author     Cyril Ponce <cyril@contao.fr>
@@ -39,8 +39,8 @@ $GLOBALS['TL_LANG']['tl_iso_tax_class']['new'][0] = 'Nouvelle taxe';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['new'][1] = 'Créer un nouvelle taxe';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['edit'][0] = 'Éditer la taxe';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['edit'][1] = 'Éditer la taxe ID %s';
-$GLOBALS['TL_LANG']['tl_iso_tax_class']['copy'][0] = 'Duppliquer la taxe';
-$GLOBALS['TL_LANG']['tl_iso_tax_class']['copy'][1] = 'Duppliquer la taxe ID %s';
+$GLOBALS['TL_LANG']['tl_iso_tax_class']['copy'][0] = 'Dupliquer la taxe';
+$GLOBALS['TL_LANG']['tl_iso_tax_class']['copy'][1] = 'Dupliquer la taxe ID %s';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['delete'][0] = 'Supprimer la taxe';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['delete'][1] = 'Supprimer la taxe ID %s';
 $GLOBALS['TL_LANG']['tl_iso_tax_class']['show'][0] = 'Afficher les détail de la taxe';

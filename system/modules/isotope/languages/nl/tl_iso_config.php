@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Paul Kegel <paul@artified.nl>
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  */
@@ -112,12 +112,12 @@ $GLOBALS['TL_LANG']['tl_iso_config']['bl'] = 'Linksonder';
 $GLOBALS['TL_LANG']['tl_iso_config']['bc'] = 'Onderzijde';
 $GLOBALS['TL_LANG']['tl_iso_config']['br'] = 'Rechtsonder';
 $GLOBALS['TL_LANG']['tl_iso_config']['cc'] = 'Gecentreerd';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwName'] = 'Naam';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwWidth'] = 'Breedte';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwHeight'] = 'Hoogte';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwMode'] = 'Mode';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwWatermark'] = 'Watermerk afbeelding';
-$GLOBALS['TL_LANG']['tl_iso_config']['iwPosition'] = 'Positie';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwName'][0] = 'Naam';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwWidth'][0] = 'Breedte';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwHeight'][0] = 'Hoogte';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwMode'][0] = 'Mode';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwWatermark'][0] = 'Watermerk afbeelding';
+$GLOBALS['TL_LANG']['tl_iso_config']['iwPosition'][0] = 'Positie';
 $GLOBALS['TL_LANG']['tl_iso_config']['fwEnabled'] = 'Zet veld aan';
 $GLOBALS['TL_LANG']['tl_iso_config']['fwLabel'] = 'Aangepast label';
 $GLOBALS['TL_LANG']['tl_iso_config']['fwMandatory'] = 'Verplicht';

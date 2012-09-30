@@ -66,6 +66,7 @@ class IsotopeRunonce extends Controller
 		$this->exec('updateProductTypes');
 		$this->exec('updateRules');
 		$this->exec('generateCategoryGroups');
+		$this->exec('createGroupForAllNonAssignedProducts');
 
 		// Make sure file extension .imt (Isotope Mail Template) is allowed for up- and download
 		if (!in_array('imt', trimsplit(',', $GLOBALS['TL_CONFIG']['uploadTypes'])))
@@ -494,7 +495,7 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 			$arrBilling = deserialize($objConfigs->billing_fields);
 			$arrShipping = deserialize($objConfigs->shipping_fields);
 
-			if (is_array($arrBilling) && count($arrBilling) && !is_array($arrBilling[0]))
+			if (is_array($arrBilling) && !empty($arrBilling) && !is_array($arrBilling[0]))
 			{
 				$arrNew = array();
 
@@ -506,7 +507,7 @@ h1 { font-size:18px; font-weight:normal; margin:0 0 18px; }
 				$this->Database->prepare("UPDATE tl_iso_config SET billing_fields=? WHERE id=?")->execute(serialize($arrNew), $objConfigs->id);
 			}
 
-			if (is_array($arrShipping) && count($arrShipping) && !is_array($arrShipping[0]))
+			if (is_array($arrShipping) && !empty($arrShipping) && !is_array($arrShipping[0]))
 			{
 				$arrNew = array();
 
@@ -707,7 +708,7 @@ CREATE TABLE `tl_iso_orderstatus` (
 		}
 
 
-		if (count($arrUpdate))
+		if (!empty($arrUpdate))
 		{
 			$objStores = $this->Database->query("SELECT * FROM tl_iso_config");
 
@@ -976,6 +977,30 @@ CREATE TABLE `tl_iso_groups` (
 				$this->Database->query("UPDATE tl_iso_products SET gid=$intGroup WHERE id IN (" . implode(',', $arrProducts) . ")");
 			}
 		}
+	}
+
+
+	/**
+	 * In Isotope 1.4 every product has to be assigned to a product groups for access permissions
+	 */
+	private function createGroupForAllNonAssignedProducts()
+	{
+		if (!$this->Database->tableExists('tl_iso_groups') || !$this->Database->tableExists('tl_iso_products'))
+		{
+			return;
+		}
+
+		$objNoGroupProducts = $this->Database->executeUncached("SELECT COUNT(id) AS total FROM tl_iso_products WHERE pid=0 AND language='' AND gid=0");
+
+		if ($objNoGroupProducts->total < 1)
+		{
+			return;
+		}
+
+		// generate a group, we can't take an existing one because we dont know which one to use
+		$intGroup = $this->Database->executeUncached("INSERT INTO tl_iso_groups (pid,sorting,tstamp,name) VALUES (0, 0, " . time() . ", '### GENERAL ###')")->insertId;
+
+		$this->Database->query("UPDATE tl_iso_products SET gid=$intGroup WHERE pid=0 AND language='' AND gid=0");
 	}
 }
 

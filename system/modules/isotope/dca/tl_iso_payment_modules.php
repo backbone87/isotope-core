@@ -143,17 +143,6 @@ $GLOBALS['TL_DCA']['tl_iso_payment_modules'] = array
 	// Fields
 	'fields' => array
 	(
-		'type' => array
-		(
-			'label'                   => &$GLOBALS['TL_LANG']['tl_iso_payment_modules']['type'],
-			'exclude'                 => true,
-			'filter'                  => true,
-			'inputType'               => 'select',
-			'default'				  => 'cash',
-			'options_callback'        => array('tl_iso_payment_modules', 'getModules'),
-			'reference'               => &$GLOBALS['ISO_LANG']['PAY'],
-			'eval'                    => array('helpwizard'=>true, 'submitOnChange'=>true, 'tl_class'=>'clr')
-		),
 		'name' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iso_payment_modules']['name'],
@@ -168,6 +157,17 @@ $GLOBALS['TL_DCA']['tl_iso_payment_modules'] = array
 			'exclude'                 => true,
 			'inputType'               => 'text',
 			'eval'                    => array('maxlength'=>255, 'tl_class'=>'w50'),
+		),
+		'type' => array
+		(
+			'label'                   => &$GLOBALS['TL_LANG']['tl_iso_payment_modules']['type'],
+			'exclude'                 => true,
+			'filter'                  => true,
+			'inputType'               => 'select',
+			'default'				  => 'cash',
+			'options_callback'        => array('tl_iso_payment_modules', 'getModules'),
+			'reference'               => &$GLOBALS['ISO_LANG']['PAY'],
+			'eval'                    => array('helpwizard'=>true, 'submitOnChange'=>true, 'chosen'=>true, 'tl_class'=>'w50')
 		),
 		'note' => array
 		(
@@ -241,14 +241,14 @@ $GLOBALS['TL_DCA']['tl_iso_payment_modules'] = array
 			'exclude'                 => true,
 			'inputType'               => 'select',
 			'options'                 => $this->getCountries(),
-			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'w50', 'chosen'=>true)
+			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'w50 w50h', 'chosen'=>true)
 		),
 		'shipping_modules' => array
 		(
 			'label'                   => &$GLOBALS['TL_LANG']['tl_iso_payment_modules']['shipping_modules'],
 			'exclude'                 => true,
 			'inputType'               => 'select',
-			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'w50', 'chosen'=>true)
+			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'w50 w50h', 'chosen'=>true)
 		),
 		'product_types' => array
 		(
@@ -256,7 +256,7 @@ $GLOBALS['TL_DCA']['tl_iso_payment_modules'] = array
 			'exclude'                 => true,
 			'inputType'               => 'select',
 			'foreignKey'			  => 'tl_iso_producttypes.name',
-			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'w50', 'chosen'=>true)
+			'eval'                    => array('multiple'=>true, 'size'=>8, 'tl_class'=>'clr w50 w50h', 'chosen'=>true)
 		),
 		'paypal_account' => array
 		(
@@ -459,7 +459,7 @@ class tl_iso_payment_modules extends Backend
 		}
 
 		// Set root IDs
-		if (!is_array($this->User->iso_payment_modules) || count($this->User->iso_payment_modules) < 1)
+		if (!is_array($this->User->iso_payment_modules) || count($this->User->iso_payment_modules) < 1) // Can't use empty() because its an object property (using __get)
 		{
 			$root = array(0);
 		}
@@ -572,7 +572,7 @@ class tl_iso_payment_modules extends Backend
 				break;
 		}
 	}
-	
+
 
 	/**
 	 * Get allowed CC types and return them as array
@@ -615,7 +615,7 @@ class tl_iso_payment_modules extends Backend
 	{
 		$arrModules = array();
 
-		if (is_array($GLOBALS['ISO_PAY']) && count($GLOBALS['ISO_PAY']))
+		if (is_array($GLOBALS['ISO_PAY']) && !empty($GLOBALS['ISO_PAY']))
 		{
 			foreach ($GLOBALS['ISO_PAY'] as $module => $class)
 			{

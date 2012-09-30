@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Rebecca Jutzi <rebecca.jutzi@bluewin.ch>
  * @author     Simon Moos <cc@simonmoos.com>
  * @author     Cyril Ponce <cyril@contao.fr>
@@ -42,8 +42,8 @@ $GLOBALS['TL_LANG']['tl_iso_shipping_options']['new'][0] = 'Nouveau taux de livr
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['new'][1] = 'Créer un nouveau taux de livraison';
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['edit'][0] = 'Éditer le taux de livraison';
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['edit'][1] = 'Éditer le taux de livraison ID %s';
-$GLOBALS['TL_LANG']['tl_iso_shipping_options']['copy'][0] = 'Duppliquer le taux de livraison';
-$GLOBALS['TL_LANG']['tl_iso_shipping_options']['copy'][1] = 'Duppliquer le taux de livraison ID %s';
+$GLOBALS['TL_LANG']['tl_iso_shipping_options']['copy'][0] = 'Dupliquer le taux de livraison';
+$GLOBALS['TL_LANG']['tl_iso_shipping_options']['copy'][1] = 'Dupliquer le taux de livraison ID %s';
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['delete'][0] = 'Supprimer le taux de livraison';
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['delete'][1] = 'Supprimer le taux de livraison ID %s';
 $GLOBALS['TL_LANG']['tl_iso_shipping_options']['show'][0] = 'Afficher les détails du taux de livraison';

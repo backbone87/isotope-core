@@ -1,6 +1,37 @@
 Isotope eCommerce Changelog
 ===========================
 
+Version 1.3.8 stable (2012-09-11)
+---------------------------------
+
+### Fixed
+- Did not use Contao's Request class to retrieve currency information
+- The reader URL did not work anymore
+
+
+Version 1.3.7 stable (2012-09-10)
+---------------------------------
+
+### Fixed
+- Javascript was displayed in raw format when using the inherit widget
+- Language bug when rebuilding the search index
+- Setting default billing or shipping address did not work for new addresses
+- AttributeWizard was not correctly displayed
+- Better permission check for product type access (#3372)
+
+
+Version 1.3.6 stable (2012-08-21)
+---------------------------------
+
+### Improved
+- Do not show cart merge warning if member cart is empty
+
+### Fixed
+- Rebuilding the search index did not consider the language fragment
+- Wrong address title when no shipping was required (only download products)
+- Convert relative URLs to absolute in email templates
+
+
 Version 1.3.5 stable (2012-08-06)
 ---------------------------------
 

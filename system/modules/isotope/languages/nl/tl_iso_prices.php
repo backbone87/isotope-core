@@ -19,7 +19,7 @@
  * Software Foundation website at <http://www.gnu.org/licenses/>.
  *
  * PHP version 5
- * @copyright  Winans Creative 2009, Intelligent Spark 2010, iserv.ch GmbH 2010
+ * @copyright  Isotope eCommerce Workgroup 2009-2012
  * @author     Paul Kegel <paul@artified.nl>
  * @license    http://opensource.org/licenses/lgpl-3.0.html
  */
@@ -46,8 +46,8 @@ $GLOBALS['TL_LANG']['tl_iso_prices']['delete'][0] = 'Verwijder prijs';
 $GLOBALS['TL_LANG']['tl_iso_prices']['delete'][1] = 'Verwijder prijs ID %s';
 $GLOBALS['TL_LANG']['tl_iso_prices']['show'][0] = 'Prijs details';
 $GLOBALS['TL_LANG']['tl_iso_prices']['show'][1] = 'Toon details van prijs ID %s';
-$GLOBALS['TL_LANG']['tl_iso_prices']['price_tier_columns']['min'] = 'Hoeveelheid (minimaal)';
-$GLOBALS['TL_LANG']['tl_iso_prices']['price_tier_columns']['price'] = 'Prijs';
+$GLOBALS['TL_LANG']['tl_iso_prices']['price_tier_columns']['min'] = array('Hoeveelheid (minimaal)');
+$GLOBALS['TL_LANG']['tl_iso_prices']['price_tier_columns']['price'] = array('Prijs');
 $GLOBALS['TL_LANG']['tl_iso_prices']['price_legend'] = 'Prijs';
 $GLOBALS['TL_LANG']['tl_iso_prices']['limit_legend'] = 'Beperkingen';
 
